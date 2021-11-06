@@ -1,66 +1,51 @@
 <template>
-  <div>
-    <section class="home">Hello World</section>
-    <section>
-      <button @click="requestMock">测试请求</button>
-      <button @click="requestMockDebounce">测试debounce请求</button>
-      <button @click="notificationMockTop()">测试顶部通知</button>
-      <button @click="notificationMockBottom()">测试底部通知</button>
-    </section>
+  <div class="home-page px-2 py-3">
+    <div class="relative w-full rounded-lg overflow-hidden">
+      <img
+        src="/images/banner.jpg"
+        alt="banner"
+        class="filter blur-2 w-full h-23vh object-cover rounded-lg"
+      />
+      <h1 class="float-title">智安小区招标演示</h1>
+    </div>
+    <h2 class="px-3 py-5 text-sm text-gray-500 font-light">我的应用</h2>
+    <van-grid>
+      <van-grid-item text="成员管理" to="/members">
+        <template #icon>
+          <i class="mdi mdi-account-group-outline module-icon text-lime-600" />
+        </template>
+      </van-grid-item>
+      <van-grid-item text="一户一档" to="/archives">
+        <template #icon>
+          <i class="mdi mdi-archive-outline module-icon text-orange-500" />
+        </template>
+      </van-grid-item>
+    </van-grid>
   </div>
 </template>
 
 <script>
-import { START_LOADING, STOP_LOADING } from "@/store/mutationTypes";
-import { mapMutations } from "vuex";
-import { debounce } from "lodash";
-
 export default {
   name: "Home",
-  methods: {
-    ...mapMutations({
-      START_LOADING,
-      STOP_LOADING
-    }),
-    requestMockDebounce: debounce(
-      async function() {
-        let res = await this.$remote.post({
-          url: "/test/network",
-          silent: true
-        });
-        console.log(res);
-        this.$notification(JSON.stringify(res));
-      },
-      500,
-      {
-        leading: true,
-        trailing: false
-      }
-    ),
-    async requestMock() {
-      let res = await this.$remote.post({
-        url: "/test/network"
-      });
-      this.$notification(JSON.stringify(res));
-    },
-    notificationMockTop() {
-      this.$notification(`{
-        text: "text From Vue",
-        title: "title From Vue",
-        type: "warning",
-        group: "top",
-        duration: 6222222
-      }`);
-    },
-    notificationMockBottom() {
-      this.$notification({
-        text: "text From Vue",
-        title: "title From Vue",
-        type: "warning",
-        group: "bottom",
-        duration: 6222
-      });
-    }
-  }
+  setup() {
+    return {};
+  },
 };
 </script>
+<style type="text/css" scoped>
+.float-title {
+  @apply absolute
+  top-8
+  text-xl
+  font-bold
+  left-6
+  bg-clip-text
+  text-transparent
+  bg-gradient-to-r
+  from-white
+  to-white;
+}
+.module-icon {
+  @apply text-3xl;
+}
+</style>

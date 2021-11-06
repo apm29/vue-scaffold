@@ -1,44 +1,37 @@
-import App from "@/App.vue";
-import router from "@/router";
-import "@/router/router.guard";
 import Vue from "vue";
-import Notifications from "vue-notification";
-import velocity from "velocity-animate";
-import store from "@/store";
-import remote from "@/utils/remote";
-import _ from "lodash";
-if (process.env.NODE_ENV === "development") {
-  import("@/mock");
-}
-Vue.use(Notifications, { velocity });
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import "@/plugins/vant";
+import "@/plugins/dayjs";
+import "@/plugins/composition-api";
+import "@/remote/remote-config";
+import "@mdi/font/css/materialdesignicons.min.css";
+import "windi.css";
+// import "@/mock/mock";
+import { findMyDistrictInfo } from "@/api/district";
+import InitializationFailed from "@/views/functional/InitializationFailed";
+
 Vue.config.productionTip = false;
-//公共延迟方法
-Vue.prototype.$delay = timeInMilliSeconds =>
-  new Promise(resolve => setTimeout(resolve, timeInMilliSeconds));
-Vue.prototype.$notification = config => {
-  if (config instanceof Object) {
-    let newConfig = Object.assign(
-      {
-        group: "top",
-        type: "info"
-      },
-      config
-    );
-    Vue.prototype.$notify(newConfig);
-  } else {
-    let newConfig = {
-      group: "top",
-      type: "info",
-      title: "通知",
-      text: config
-    };
-    Vue.prototype.$notify(newConfig);
-  }
-};
-Vue.prototype.$remote = remote;
-Vue.prototype.$debounce = _.debounce;
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount("#app");
+
+store.commit(
+  "SET_TOKEN",
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhbnhpbmp1IjoiMTYyNjY3NzM1MjExNzUxNzM2NjAiLCJjcmVhdGVkIjoxNjM1OTAxNjcxOTA4LCJuaWNrTmFtZSI6IuWtmeadsCIsImF2YXRhciI6Imh0dHA6Ly9maWxlcy5jaWloLm5ldC9NMDAvMDcvNEQvd0tqSW8xMUtiQ1dBWkd4eUFBRXZjbXFxNzZFODYyLmpwZyIsInVzZXJOYW1lIjoi5a2Z5p2wIn0.AfIrSpFlE8Q6UCuc9sTzf68bSH6uOBLSHKNx3puTmr4"
+);
+
+findMyDistrictInfo()
+  .then((res) => {
+    store.commit("SET_DISTRICT_LIST", res.data);
+    new Vue({
+      router,
+      store,
+      render: (h) => h(App),
+    }).$mount("#app");
+  })
+  .catch((err) => {
+    new Vue({
+      router,
+      store,
+      render: (h) => h(InitializationFailed),
+    }).$mount("#app");
+  });

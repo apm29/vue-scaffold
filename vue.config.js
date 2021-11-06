@@ -1,47 +1,44 @@
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
-const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const BASE_URL = process.env.NODE_ENV === "production" ? "/" : "/";
 const path = require("path");
 
 module.exports = {
   publicPath: BASE_URL,
   assetsDir: "assets",
-  transpileDependencies: ["vuetify"],
   productionSourceMap: false,
   devServer: {
-    port: 6230,
-    open: process.platform === "darwin",
+    port: 8081,
+    open: false,
     host: "0.0.0.0",
     https: false,
-    hotOnly: false
-    // proxy: "http://localhost:8888" // string | Object
+    hotOnly: false,
+    proxy: {
+      "/business": {
+        target: "http://axj.ciih.net",
+        changeOrigin: true,
+      },
+    },
+  },
+  chainWebpack(config) {
+    //修改htmlWebpackPlugin
+    config.plugin("html").tap((args) => {
+      args[0].title = "智安小区招标演示";
+      return args;
+    });
   },
   configureWebpack: {
-    name: "e-road",
-    plugins:
-      process.env.NODE_ENV === "development"
-        ? []
-        : [
-            //dist大小分析
-            new BundleAnalyzerPlugin(),
-            //压缩文件
-            new CompressionWebpackPlugin({
-              test: /\.js$|\.html$|.\css/, //匹配文件名
-              threshold: 10240, //对超过10k的数据压缩
-              deleteOriginalAssets: false //不删除源文件
-            })
-          ],
-    externals: {
-      vue: "Vue"
-    },
+    plugins: [],
     context: path.resolve(__dirname, "./"),
     //别名配置
     resolve: {
       extensions: [".js", ".vue"],
       alias: {
-        "@": path.resolve(__dirname, "src")
-      }
-    }
-  }
+        "@": path.resolve(__dirname, "src"),
+      },
+    },
+  },
+  pluginOptions: {
+    windicss: {
+      // see https://github.com/windicss/vite-plugin-windicss/blob/main/packages/plugin-utils/src/options.ts
+    },
+  },
 };
